@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CineAdmin — Panel de Control</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.0/index.css">
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+  
+  .fade-in { animation: fadeIn 0.3s ease-out; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .modal-in { animation: modalIn 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  
+  .toast-in { animation: toastIn 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(100%); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  
+  .gradient-text {
+    background: linear-gradient(135deg, #f43f5e 0%, #a855f7 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .card-hover { transition: all 0.25s ease; }
+  .card-hover:hover { transform: translateY(-4px); box-shadow: 0 15px 40px rgba(0,0,0,0.4); }
+  
+  .nav-item { transition: all 0.2s ease; }
+  .nav-item:hover { background: rgba(244, 63, 94, 0.08); }
+  .nav-item.active {
+    background: linear-gradient(135deg, rgba(244, 63, 94, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+    border-left: 3px solid #f43f5e;
+  }
+  
+  .input-dark {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    color: #f3f4f6;
+    transition: all 0.2s ease;
+  }
+  .input-dark:focus {
+    outline: none;
+    border-color: #f43f5e;
+    box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15);
+  }
+  
+  .btn-gradient {
+    background: linear-gradient(135deg, #f43f5e 0%, #a855f7 100%);
+    transition: all 0.3s ease;
+  }
+  .btn-gradient:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px rgba(244, 63, 94, 0.4);
+  }
+  .btn-gradient:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+  
+  .star { color: #374151; cursor: pointer; transition: all 0.15s ease; user-select: none; }
+  .star.active { color: #fbbf24; }
+  .star:hover { transform: scale(1.15); }
+  
+  .chip {
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  .chip.active {
+    background: linear-gradient(135deg, #f43f5e 0%, #a855f7 100%);
+    color: white;
+    border-color: transparent;
+  }
+  
+  .movie-card { position: relative; overflow: hidden; }
+  .movie-card .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.3) 50%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: flex-end;
+    padding: 1rem;
+  }
+  .movie-card:hover .overlay { opacity: 1; }
+  .movie-card:hover .card-image { transform: scale(1.08); }
+  .card-image { transition: transform 0.5s ease; }
+  
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+
+<div class="flex min-h-screen">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-gray-900 border-r border-gray-800 flex flex-col fixed h-screen z-20">
+    <div class="p-6 border-b border-gray-800">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-purple-600 flex items-center justify-center shadow-lg shadow-rose-500/20">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold gradient-text">CineAdmin</h1>
+          <p class="text-xs text-gray-500">Panel de Control</p>
+        </div>
+      </div>
+    </div>
+
+    <nav class="flex-1 p-4 space-y-1 overflow-y-auto scrollbar-thin">
+      <p class="text-xs uppercase text-gray-500 font-semibold px-3 mb-2 tracking-wider">Catálogo</p>
+      <a href="#" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+        Dashboard
+      </a>
+      <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" /></svg>
+        Películas
+        <span class="ml-auto bg-rose-500/20 text-rose-400 text-xs px-2 py-0.5 rounded-full" id="navCount">0</span>
+      </a>
+      <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+        Series
+      </a>
+      <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+        Géneros
+      </a>
+
+      <p class="text-xs uppercase text-gray-500 font-semibold px-3 mb-2 mt-6 tracking-wider">Sistema</p>
+      <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+        Analíticas
+      </a>
+      <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+        Configuración
+      </a>
+    </nav>
+
+    <div class="p-4 border-t border-gray-800">
+      <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-800 cursor-pointer transition">
+        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-rose-500 to-purple-600 flex items-center justify-center text-sm font-bold">AD</div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium truncate">Admin</p>
+          <p class="text-xs text-gray-500 truncate">admin@cineadmin.com</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 ml-64">
+    <!-- Header -->
+    <header class="sticky top-0 z-10 bg-gray-950/80 backdrop-blur-lg border-b border-gray-800 px-8 py-4">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold">Dashboard</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Gestiona tu catálogo de películas</p>
+        </div>
+        <button id="btnAddMovie" class="btn-gradient px-5 py-2.5 text-sm font-semibold text-white rounded-lg flex items-center gap-2 shadow-lg shadow-rose-500/20">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+          Añadir película
+        </button>
+      </div>
+    </header>
+
+    <div class="p-8 space-y-6">
+      <!-- Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="card-hover bg-gray-900 border border-gray-800 rounded-xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-rose-500/10 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" /></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold" id="statTotal">0</p>
+          <p class="text-sm text-gray-500 mt-1">Total películas</p>
+        </div>
+        <div class="card-hover bg-gray-900 border border-gray-800 rounded-xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold" id="statRating">0.0</p>
+          <p class="text-sm text-gray-500 mt-1">Rating promedio</p>
+        </div>
+        <div class="card-hover bg-gray-900 border border-gray-800 rounded-xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold" id="statGenres">0</p>
+          <p class="text-sm text-gray-500 mt-1">Géneros únicos</p>
+        </div>
+        <div class="card-hover bg-gray-900 border border-gray-800 rounded-xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-sky-500/10 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold" id="statDuration">0 min</p>
+          <p class="text-sm text-gray-500 mt-1">Duración promedio</p>
+        </div>
+      </div>
+
+      <!-- Search + Filters -->
+      <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+        <div class="flex flex-col lg:flex-row gap-4">
+          <!-- Search -->
+          <div class="flex-1 relative">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            <input type="text" id="searchInput" placeholder="Buscar por título, director o reparto..." class="input-dark w-full pl-10 pr-10 py-3 rounded-lg text-sm"/>
+            <button id="clearSearch" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white hidden">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+
+          <!-- Sort -->
+          <select id="sortSelect" class="input-dark px-4 py-3 rounded-lg text-sm min-w-[180px]">
+            <option value="recent">Más recientes</option>
+            <option value="title">Título (A-Z)</option>
+            <option value="title-desc">Título (Z-A)</option>
+            <option value="rating-desc">Mayor rating</option>
+            <option value="rating">Menor rating</option>
+            <option value="year-desc">Año (nuevos)</option>
+            <option value="year">Año (antiguos)</option>
+          </select>
+        </div>
+
+        <!-- Genre chips -->
+        <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-800">
+          <span class="chip active px-3 py-1.5 text-xs font-medium bg-gray-800 border border-gray-700 rounded-full" data-genre="all">Todos</span>
+          <span class="chip px-3 py-1.5 text-xs font-medium bg-gray-800 border border-gray-700 text-gray-400 rounded-full" data-genre="Acción">Acción</span>
+          <span class="chip px-3 py-1.5 text-xs font-medium bg-gray-800 border border-gray-700 text-gray-400 rounded-full" data-genre="Drama">Drama</span>
+          <span class="chip px-3 py-1.5 text-xs font-medium bg-gray-800 border border-gray-700 text-gray-400 rounded-full" data-genre="Comedia">Comedia</span>
+          <span class="chip px-3 py-1.5 text-xs font-medium bg-gray-800 border border-gray-700 text-gray-400 rounded-full" data-genre="Ciencia Ficción">Ciencia Ficción</span>
+          <span class="chip px-3 py-1.5 text-xs font-medium bg-gray-800 border border-gray-700 text-gray-400 rounded-full" data-genre="Thriller">Thriller</span>
+          <span class="chip px-3 py-1.5 text-xs font-medium bg-gray-800 border border-gray-700 text-gray-400 rounded-full" data-genre="Horror">Horror</span>
+          <span class="chip px-3 py-1.5 text-xs font-medium bg-gray-800 border border-gray-700 text-gray-400 rounded-full" data-genre="Romance">Romance</span>
+          <span class="chip px-3 py-1.5 text-xs font-medium bg-gray-800 border border-gray-700 text-gray-400 rounded-full" data-genre="Animación">Animación</span>
+        </div>
+      </div>
+
+      <!-- Movies Grid -->
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold">Catálogo</h3>
+          <p class="text-sm text-gray-500"><span id="listCount">0</span> resultados</p>
+        </div>
+        <div id="moviesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
+        <div id="emptyState" class="hidden bg-gray-900 border border-gray-800 rounded-xl p-12 text-center">
+          <div class="w-16 h-16 mx-auto rounded-full bg-gray-800 flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          </div>
+          <h4 class="font-semibold text-lg mb-1">No se encontraron películas</h4>
+          <p class="text-sm text-gray-500 mb-4" id="emptyText">Intenta ajustar los filtros o añadir una nueva película</p>
+          <button id="emptyAddBtn" class="btn-gradient px-5 py-2.5 text-sm font-semibold text-white rounded-lg inline-flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+            Añadir película
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal: Add/Edit -->
+<div id="movieModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
+  <div class="modal-in bg-gray-900 border border-gray-800 rounded-2xl max-w-3xl w-full my-8 shadow-2xl">
+    <div class="p-6 border-b border-gray-800 flex items-center justify-between">
+      <div>
+        <h3 id="modalTitle" class="text-xl font-bold flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+          <span>Nueva película</span>
+        </h3>
+        <p class="text-sm text-gray-500 mt-1">Completa los datos de la película</p>
+      </div>
+      <button id="closeModal" class="p-2 rounded-lg hover:bg-gray-800 transition text-gray-400 hover:text-white">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+
+    <form id="movieForm" class="p-6 space-y-5">
+      <input type="hidden" id="movieId"/>
+
+      <!-- Title + Year -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-400 mb-2">Título <span class="text-rose-400">*</span></label>
+          <input type="text" id="title" required placeholder="Ej: Inception" class="input-dark w-full px-4 py-2.5 rounded-lg text-sm"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-400 mb-2">Año</label>
+          <input type="number" id="year" placeholder="2024" min="1900" max="2099" class="input-dark w-full px-4 py-2.5 rounded-lg text-sm"/>
+        </div>
+      </div>
+
+      <!-- URLs -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-400 mb-2">URL de la película</label>
+          <input type="url" id="movieUrl" placeholder="https://..." class="input-dark w-full px-4 py-2.5 rounded-lg text-sm"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-400 mb-2">URL de la imagen</label>
+          <input type="url" id="image" placeholder="https://..." class="input-dark w-full px-4 py-2.5 rounded-lg text-sm"/>
+        </div>
+      </div>
+
+      <!-- Duration + Genre + Rating -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-400 mb-2">Duración (min)</label>
+          <input type="number" id="duration" placeholder="120" min="0" class="input-dark w-full px-4 py-2.5 rounded-lg text-sm"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-400 mb-2">Género</label>
+          <select id="genre" class="input-dark w-full px-4 py-2.5 rounded-lg text-sm">
+            <option value="">Seleccionar...</option>
+            <option value="Acción">Acción</option>
+            <option value="Aventura">Aventura</option>
+            <option value="Animación">Animación</option>
+            <option value="Comedia">Comedia</option>
+            <option value="Crimen">Crimen</option>
+            <option value="Documental">Documental</option>
+            <option value="Drama">Drama</option>
+            <option value="Fantasía">Fantasía</option>
+            <option value="Horror">Horror</option>
+            <option value="Misterio">Misterio</option>
+            <option value="Romance">Romance</option>
+            <option value="Ciencia Ficción">Ciencia Ficción</option>
+            <option value="Thriller">Thriller</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-400 mb-2">Rating</label>
+          <div class="flex items-center gap-1 h-[42px] px-3 bg-gray-950 border border-gray-800 rounded-lg">
+            <span class="star text-2xl" data-val="1">★</span>
+            <span class="star text-2xl" data-val="2">★</span>
+            <span class="star text-2xl" data-val="3">★</span>
+            <span class="star text-2xl" data-val="4">★</span>
+            <span class="star text-2xl" data-val="5">★</span>
+            <input type="hidden" id="rating" value="0"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Director + Cast -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-400 mb-2">Director</label>
+          <input type="text" id="director" placeholder="Christopher Nolan" class="input-dark w-full px-4 py-2.5 rounded-lg text-sm"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-400 mb-2">Reparto</label>
+          <input type="text" id="cast" placeholder="Actor 1, Actor 2, Actor 3" class="input-dark w-full px-4 py-2.5 rounded-lg text-sm"/>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="block text-sm font-medium text-gray-400 mb-2">Descripción</label>
+        <textarea id="description" rows="4" placeholder="Sinopsis de la película..." class="input-dark w-full px-4 py-2.5 rounded-lg text-sm resize-none"></textarea>
+        <p class="text-xs text-gray-500 mt-1 text-right"><span id="charCount">0</span> / 500</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center justify-end gap-2 pt-4 border-t border-gray-800">
+        <button type="button" id="cancelModal" class="px-4 py-2.5 text-sm font-medium text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 rounded-lg transition">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-gradient px-6 py-2.5 text-sm font-semibold text-white rounded-lg flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+          <span id="submitText">Guardar</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: View Details -->
+<div id="detailModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
+  <div class="modal-in bg-gray-900 border border-gray-800 rounded-2xl max-w-2xl w-full my-8 shadow-2xl overflow-hidden">
+    <div id="detailImage" class="h-64 bg-gradient-to-br from-rose-500/20 to-purple-600/20 relative">
+      <button id="closeDetail" class="absolute top-4 right-4 p-2 rounded-lg bg-black/50 hover:bg-black/70 text-white transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+    <div class="p-6">
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <div>
+          <h3 id="detailTitle" class="text-2xl font-bold mb-2"></h3>
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-400">
+            <span id="detailYear"></span>
+            <span>•</span>
+            <span id="detailDuration"></span>
+            <span id="detailGenreBadge" class="px-2 py-0.5 bg-rose-500/20 text-rose-400 rounded text-xs font-medium"></span>
+          </div>
+        </div>
+        <div id="detailStars" class="flex items-center gap-0.5"></div>
+      </div>
+      <p id="detailDescription" class="text-gray-300 text-sm leading-relaxed mb-5"></p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-800">
+        <div>
+          <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Director</p>
+          <p id="detailDirector" class="text-sm font-medium"></p>
+        </div>
+        <div>
+          <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Reparto</p>
+          <p id="detailCast" class="text-sm font-medium"></p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 mt-6 pt-4 border-t border-gray-800">
+        <button id="detailEditBtn" class="flex-1 px-4 py-2.5 text-sm font-semibold bg-gray-800 hover:bg-gray-700 rounded-lg transition flex items-center justify-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+          Editar
+        </button>
+        <button id="detailDeleteBtn" class="flex-1 px-4 py-2.5 text-sm font-semibold bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-lg transition flex items-center justify-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a2 2 0 012-2h2a2 2 0 012 2v3" /></svg>
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div id="confirmModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+  <div class="modal-in bg-gray-900 border border-gray-800 rounded-xl max-w-md w-full p-6">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+      </div>
+      <div>
+        <h4 class="font-bold text-lg">¿Eliminar película?</h4>
+        <p class="text-sm text-gray-500">Esta acción no se puede deshacer</p>
+      </div>
+    </div>
+    <p id="confirmText" class="text-sm text-gray-400 mb-5"></p>
+    <div class="flex items-center justify-end gap-2">
+      <button id="confirmCancel" class="px-4 py-2 text-sm font-medium bg-gray-800 hover:bg-gray-700 rounded-lg transition">Cancelar</button>
+      <button id="confirmOk" class="px-4 py-2 text-sm font-medium bg-red-500 hover:bg-red-600 rounded-lg transition">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer" class="fixed top-6 right-6 z-[70] space-y-2"></div>
+
+<script>
+// =================== STATE ===================
+const STORAGE_KEY = 'cineadmin_movies_v2';
+let movies = [];
+let currentFilter = { search: '', genre: 'all', sort: 'recent' };
+let editingId = null;
+let viewingId = null;
+let confirmCallback = null;
+
+const sampleMovies = [
+  {
+    id: 1,
+    title: "Inception",
+    year: "2010",
+    movieUrl: "https://example.com/inception",
+    image: "",
+    duration: "148",
+    description: "Un ladrón que roba secretos corporativos mediante la tecnología de los sueños recibe la tarea inversa de implantar una idea en la mente de un CEO.",
+    director: "Christopher Nolan",
+    cast: "Leonardo DiCaprio, Joseph Gordon-Levitt, Elliot Page",
+    genre: "Ciencia Ficción",
+    rating: "5"
+  },
+  {
+    id: 2,
+    title: "The Dark Knight",
+    year: "2008",
+    movieUrl: "https://example.com/dark-knight",
+    image: "",
+    duration: "152",
+    description: "Batman enfrenta al Joker, un criminal anárquico que sumerge a Gotham City en el caos y obliga al Caballero Oscuro a enfrentarse a sus límites.",
+    director: "Christopher Nolan",
+    cast: "Christian Bale, Heath Ledger, Aaron Eckhart",
+    genre: "Acción",
+    rating: "5"
+  },
+  {
+    id: 3,
+    title: "Parasite",
+    year: "2019",
+    movieUrl: "https://example.com/parasite",
+    image: "",
+    duration: "132",
+    description: "La familia Kim, todos desempleados, se interesa por la adinerada familia Park. Un plan ingenioso desencadena una serie de eventos inesperados.",
+    director: "Bong Joon-ho",
+    cast: "Song Kang-ho, Lee Sun-kyun, Cho Yeo-jeong",
+    genre: "Thriller",
+    rating: "5"
+  },
+  {
+    id: 4,
+    title: "Interstellar",
+    year: "2014",
+    movieUrl: "https://example.com/interstellar",
+    image: "",
+    duration: "169",
+    description: "Un equipo de exploradores viaja a través de un agujero de gusano en el espacio en un intento de asegurar la supervivencia de la humanidad.",
+    director: "Christopher Nolan",
+    cast: "Matthew McConaughey, Anne Hathaway, Jessica Chastain",
+    genre: "Ciencia Ficción",
+    rating: "5"
+  },
+  {
+    id: 5,
+    title: "The Shawshank Redemption",
+    year: "1994",
+    movieUrl: "https://example.com/shawshank",
+    image: "",
+    duration: "142",
+    description: "Dos hombres encarcelados forman una amistad a lo largo de varios años, encontrando consuelo y eventual redención a través de actos de decencia común.",
+    director: "Frank Darabont",
+    cast: "Tim Robbins, Morgan Freeman",
+    genre: "Drama",
+    rating: "5"
+  },
+  {
+    id: 6,
+    title: "Pulp Fiction",
+    year: "1994",
+    movieUrl: "https://example.com/pulp-fiction",
+    image: "",
+    duration: "154",
+    description: "Las vidas de dos sicarios, un boxeador, la esposa de un gángster y dos bandidos se entrelazan en cuatro relatos de violencia y redención.",
+    director: "Quentin Tarantino",
+    cast: "John Travolta, Uma Thurman, Samuel L. Jackson",
+    genre: "Crimen",
+    rating: "5"
+  }
+];
+
+// =================== INIT ===================
+function init() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  movies = saved ? JSON.parse(saved) : [...sampleMovies];
+  if (!saved) saveMovies();
+  render();
+  bindEvents();
+}
+
+function saveMovies() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(movies));
+}
+
+// =================== EVENTS ===================
+function bindEvents() {
+  // Add button
+  document.getElementById('btnAddMovie').addEventListener('click', () => openModal());
+  document.getElementById('emptyAddBtn').addEventListener('click', () => openModal());
+
+  // Modal close
+  document.getElementById('closeModal').addEventListener('click', closeModal);
+  document.getElementById('cancelModal').addEventListener('click', closeModal);
+  document.getElementById('movieModal').addEventListener('click', (e) => {
+    if (e.target.id === 'movieModal') closeModal();
+  });
+
+  // Detail modal
+  document.getElementById('closeDetail').addEventListener('click', closeDetail);
+  document.getElementById('detailModal').addEventListener('click', (e) => {
+    if (e.target.id === 'detailModal') closeDetail();
+  });
+  document.getElementById('detailEditBtn').addEventListener('click', () => {
+    if (viewingId) {
+      closeDetail();
+      setTimeout(() => openModal(viewingId), 200);
+    }
+  });
+  document.getElementById('detailDeleteBtn').addEventListener('click', () => {
+    if (viewingId) {
+      const m = movies.find(x => x.id === viewingId);
+      closeDetail();
+      setTimeout(() => showConfirm(`¿Eliminar "${m?.title}"?`, () => deleteMovie(viewingId)), 200);
+    }
+  });
+
+  // Form submit
+  document.getElementById('movieForm').addEventListener('submit', handleSubmit);
+
+  // Stars
+  document.querySelectorAll('#movieForm .star').forEach(star => {
+    star.addEventListener('click', () => {
+      const val = parseInt(star.dataset.val);
+      const current = parseInt(document.getElementById('rating').value);
+      const newVal = current === val ? 0 : val;
+      document.getElementById('rating').value = newVal;
+      renderFormStars(newVal);
+    });
+    star.addEventListener('mouseenter', () => highlightFormStars(parseInt(star.dataset.val)));
+  });
+  document.querySelector('#movieForm .flex.items-center.gap-1').addEventListener('mouseleave', () => {
+    renderFormStars(parseInt(document.getElementById('rating').value));
+  });
+
+  // Char count
+  document.getElementById('description').addEventListener('input', (e) => {
+    document.getElementById('charCount').textContent = e.target.value.length;
+  });
+
+  // Search
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    currentFilter.search = e.target.value;
+    document.getElementById('clearSearch').classList.toggle('hidden', !e.target.value);
+    render();
+  });
+  document.getElementById('clearSearch').addEventListener('click', () => {
+    document.getElementById('searchInput').value = '';
+    currentFilter.search = '';
+    document.getElementById('clearSearch').classList.add('hidden');
+    render();
+  });
+
+  // Sort
+  document.getElementById('sortSelect').addEventListener('change', (e) => {
+    currentFilter.sort = e.target.value;
+    render();
+  });
+
+  // Genre chips
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(c => {
+        c.classList.remove('active');
+        c.classList.add('text-gray-400');
+      });
+      chip.classList.add('active');
+      chip.classList.remove('text-gray-400');
+      currentFilter.genre = chip.dataset.genre;
+      render();
+    });
+  });
+
+  // Confirm modal
+  document.getElementById('confirmCancel').addEventListener('click', hideConfirm);
+  document.getElementById('confirmModal').addEventListener('click', (e) => {
+    if (e.target.id === 'confirmModal') hideConfirm();
+  });
+
+  // Keyboard
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (!document.getElementById('confirmModal').classList.contains('hidden')) hideConfirm();
+      else if (!document.getElementById('movieModal').classList.contains('hidden')) closeModal();
+      else if (!document.getElementById('detailModal').classList.contains('hidden')) closeDetail();
+    }
+  });
+}
+
+// =================== STARS ===================
+function highlightFormStars(val) {
+  document.querySelectorAll('#movieForm .star').forEach(s => {
+    s.classList.toggle('active', parseInt(s.dataset.val) <= val);
+  });
+}
+function renderFormStars(val) {
+  highlightFormStars(val);
+}
+
+// =================== MODAL ===================
+function openModal(id = null) {
+  editingId = id;
+  const form = document.getElementById('movieForm');
+  form.reset();
+  document.getElementById('rating').value = '0';
+  renderFormStars(0);
+  document.getElementById('charCount').textContent = '0';
+
+  if (id) {
+    const m = movies.find(x => x.id === id);
+    if (!m) return;
+    document.getElementById('movieId').value = m.id;
+    document.getElementById('title').value = m.title || '';
+    document.getElementById('year').value = m.year || '';
+    document.getElementById('movieUrl').value = m.movieUrl || '';
+    document.getElementById('image').value = m.image || '';
+    document.getElementById('duration').value = m.duration || '';
+    document.getElementById('description').value = m.description || '';
+    document.getElementById('director').value = m.director || '';
+    document.getElementById('cast').value = m.cast || '';
+    document.getElementById('genre').value = m.genre || '';
+    document.getElementById('rating').value = m.rating || '0';
+    renderFormStars(parseInt(m.rating) || 0);
+    document.getElementById('charCount').textContent = (m.description || '').length;
+    document.querySelector('#modalTitle span').textContent = 'Editar película';
+    document.querySelector('#modalTitle svg').innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />';
+    document.getElementById('submitText').textContent = 'Guardar cambios';
+  } else {
+    document.getElementById('movieId').value = '';
+    document.querySelector('#modalTitle span').textContent = 'Nueva película';
+    document.querySelector('#modalTitle svg').innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />';
+    document.getElementById('submitText').textContent = 'Crear película';
+  }
+
+  document.getElementById('movieModal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('title').focus(), 100);
+}
+
+function closeModal() {
+  document.getElementById('movieModal').classList.add('hidden');
+  document.body.style.overflow = '';
+  editingId = null;
+}
+
+// =================== DETAIL MODAL ===================
+function openDetail(id) {
+  const m = movies.find(x => x.id === id);
+  if (!m) return;
+  viewingId = id;
+
+  document.getElementById('detailTitle').textContent = m.title || 'Sin título';
+  document.getElementById('detailYear').textContent = m.year || '—';
+  document.getElementById('detailDuration').textContent = m.duration ? `${m.duration} min` : '—';
+  document.getElementById('detailGenreBadge').textContent = m.genre || 'Sin género';
+  document.getElementById('detailGenreBadge').style.display = m.genre ? '' : 'none';
+  document.getElementById('detailDescription').textContent = m.description || 'Sin descripción disponible.';
+  document.getElementById('detailDirector').textContent = m.director || '—';
+  document.getElementById('detailCast').textContent = m.cast || '—';
+
+  const imgContainer = document.getElementById('detailImage');
+  if (m.image) {
+    imgContainer.style.backgroundImage = `url(${m.image})`;
+    imgContainer.style.backgroundSize = 'cover';
+    imgContainer.style.backgroundPosition = 'center';
+  } else {
+    imgContainer.style.backgroundImage = '';
+    imgContainer.className = 'h-64 bg-gradient-to-br from-rose-500/30 to-purple-600/30 relative flex items-center justify-center';
+    imgContainer.innerHTML = `
+      <button id="closeDetail" class="absolute top-4 right-4 p-2 rounded-lg bg-black/50 hover:bg-black/70 text-white transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" /></svg>
+    `;
+    document.getElementById('closeDetail').addEventListener('click', closeDetail);
+  } else {
+    imgContainer.className = 'h-64 relative';
+    imgContainer.innerHTML = `<button id="closeDetail" class="absolute top-4 right-4 p-2 rounded-lg bg-black/50 hover:bg-black/70 text-white transition z-10"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>`;
+    document.getElementById('closeDetail').addEventListener('click', closeDetail);
+  }
+
+  // Stars
+  const rating = parseInt(m.rating) || 0;
+  const starsContainer = document.getElementById('detailStars');
+  if (rating > 0) {
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+      html += `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ${i <= rating ? 'text-amber-400' : 'text-gray-700'}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>`;
+    }
+    starsContainer.innerHTML = html;
+  } else {
+    starsContainer.innerHTML = '<span class="text-sm text-gray-500">Sin rating</span>';
+  }
+
+  document.getElementById('detailModal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDetail() {
+  document.getElementById('detailModal').classList.add('hidden');
+  document.body.style.overflow = '';
+  viewingId = null;
+}
+
+// =================== FORM SUBMIT ===================
+function handleSubmit(e) {
+  e.preventDefault();
+  const data = {
+    title: document.getElementById('title').value.trim(),
+    year: document.getElementById('year').value.trim(),
+    movieUrl: document.getElementById('movieUrl').value.trim(),
+    image: document.getElementById('image').value.trim(),
+    duration: document.getElementById('duration').value.trim(),
+    description: document.getElementById('description').value.trim(),
+    director: document.getElementById('director').value.trim(),
+    cast: document.getElementById('cast').value.trim(),
+    genre: document.getElementById('genre').value,
+    rating: document.getElementById('rating').value
+  };
+
+  if (!data.title) {
+    showToast('El título es obligatorio', 'error');
+    document.getElementById('title').focus();
+    return;
+  }
+
+  if (editingId) {
+    const idx = movies.findIndex(m => m.id === editingId);
+    movies[idx] = { ...movies[idx], ...data };
+    showToast(`"${data.title}" actualizada`, 'success');
+  } else {
+    const newId = movies.length > 0 ? Math.max(...movies.map(m => m.id)) + 1 : 1;
+    movies.unshift({ id: newId, ...data });
+    showToast(`"${data.title}" creada`, 'success');
+  }
+
+  saveMovies();
+  closeModal();
+  render();
+}
+
+function deleteMovie(id) {
+  const movie = movies.find(m => m.id === id);
+  movies = movies.filter(m => m.id !== id);
+  saveMovies();
+  showToast(`"${movie.title}" eliminada`, 'success');
+  render();
+}
+
+// =================== RENDER ===================
+function getFilteredMovies() {
+  let list = [...movies];
+  
+  // Search
+  if (currentFilter.search) {
+    const q = currentFilter.search.toLowerCase();
+    list = list.filter(m =>
+      (m.title || '').toLowerCase().includes(q) ||
+      (m.director || '').toLowerCase().includes(q) ||
+      (m.cast || '').toLowerCase().includes(q) ||
+      (m.genre || '').toLowerCase().includes(q)
+    );
+  }
+  
+  // Genre
+  if (currentFilter.genre !== 'all') {
+    list = list.filter(m => m.genre === currentFilter.genre);
+  }
+  
+  // Sort
+  switch (currentFilter.sort) {
+    case 'title':
+      list.sort((a,b) => (a.title || '').localeCompare(b.title || ''));
+      break;
+    case 'title-desc':
+      list.sort((a,b) => (b.title || '').localeCompare(a.title || ''));
+      break;
+    case 'rating-desc':
+      list.sort((a,b) => (parseInt(b.rating)||0) - (parseInt(a.rating)||0));
+      break;
+    case 'rating':
+      list.sort((a,b) => (parseInt(a.rating)||0) - (parseInt(b.rating)||0));
+      break;
+    case 'year-desc':
+      list.sort((a,b) => (parseInt(b.year)||0) - (parseInt(a.year)||0));
+      break;
+    case 'year':
+      list.sort((a,b) => (parseInt(a.year)||0) - (parseInt(b.year)||0));
+      break;
+    default:
+      list.sort((a,b) => b.id - a.id);
+  }
+  
+  return list;
+}
+
+function render() {
+  const filtered = getFilteredMovies();
+  const grid = document.getElementById('moviesGrid');
+  const empty = document.getElementById('emptyState');
+  const emptyText = document.getElementById('emptyText');
+
+  document.getElementById('listCount').textContent = filtered.length;
+  document.getElementById('navCount').textContent = movies.length;
+
+  if (filtered.length === 0) {
+    grid.classList.add('hidden');
+    empty.classList.remove('hidden');
+    if (movies.length === 0) {
+      emptyText.textContent = 'Tu catálogo está vacío. ¡Añade tu primera película!';
+    } else {
+      emptyText.textContent = 'No se encontraron resultados con los filtros actuales';
+    }
+  } else {
+    grid.classList.remove('hidden');
+    empty.classList.add('hidden');
+  }
+
+  grid.innerHTML = filtered.map(m => {
+    const rating = parseInt(m.rating) || 0;
+    let starsHtml = '';
+    if (rating > 0) {
+      for (let i = 1; i <= 5; i++) {
+        starsHtml += `<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 ${i <= rating ? 'text-amber-400' : 'text-gray-700'}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>`;
+      }
+    }
+    
+    const initial = (m.title || '?').charAt(0).toUpperCase();
+    const colors = ['from-rose-500 to-pink-600','from-purple-500 to-indigo-600','from-amber-500 to-orange-600','from-emerald-500 to-teal-600','from-sky-500 to-blue-600','from-fuchsia-500 to-purple-600'];
+    const colorClass = colors[m.id % colors.length];
+    
+    return `
+      <div class="movie-card card-hover bg-gray-900 border border-gray-800 rounded-xl overflow-hidden cursor-pointer fade-in" onclick="openDetail(${m.id})">
+        <div class="h-56 bg-gradient-to-br ${colorClass} relative overflow-hidden flex items-center justify-center">
+          ${m.image ? `<img src="${m.image}" alt="${m.title}" class="card-image w-full h-full object-cover" onerror="this.style.display='none'"/>` : `<span class="text-6xl font-bold text-white/40">${initial}</span>`}
+          ${m.genre ? `<span class="absolute top-3 left-3 text-[10px] px-2 py-1 bg-black/60 backdrop-blur rounded text-white font-medium">${m.genre}</span>` : ''}
+          <div class="overlay">
+            <div class="w-full">
+              <div class="flex items-center gap-2">
+                <button onclick="event.stopPropagation(); openModal(${m.id})" class="flex-1 px-3 py-2 bg-white/10 hover:bg-white/20 backdrop-blur rounded-lg text-xs font-semibold text-white transition flex items-center justify-center gap-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                  Editar
+                </button>
+                <button onclick="event.stopPropagation(); showConfirm('¿Eliminar \\x22${m.title.replace(/'/g,"\\'")}\\x22?', () => deleteMovie(${m.id}))" class="px-3 py-2 bg-red-500/80 hover:bg-red-500 backdrop-blur rounded-lg text-xs font-semibold text-white transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a2 2 0 012-2h2a2 2 0 012 2v3" /></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="p-4">
+          <h4 class="font-bold text-sm mb-1 truncate">${m.title}</h4>
+          <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">
+            <span>${m.year || '—'}</span>
+            ${m.duration ? `<span>• ${m.duration} min</span>` : ''}
+          </div>
+          <p class="text-xs text-gray-400 line-clamp-2 mb-3">${m.description || 'Sin descripción'}</p>
+          <div class="flex items-center justify-between pt-3 border-t border-gray-800">
+            <div class="flex items-center gap-0.5">${starsHtml || '<span class="text-[10px] text-gray-600">Sin rating</span>'}</div>
+            <span class="text-[10px] text-gray-500 truncate max-w-[100px]">${m.director || '—'}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  updateStats();
+}
+
+function updateStats() {
+  document.getElementById('statTotal').textContent = movies.length;
+  
+  const ratings = movies.map(m => parseInt(m.rating) || 0).filter(r => r > 0);
+  const avg = ratings.length ? (ratings.reduce((a,b) => a+b, 0) / ratings.length).toFixed(1) : '0.0';
+  document.getElementById('statRating').textContent = avg;
+
+  const genres = new Set(movies.map(m => m.genre).filter(Boolean));
+  document.getElementById('statGenres').textContent = genres.size;
+
+  const durations = movies.map(m => parseInt(m.duration) || 0).filter(d => d > 0);
+  const avgDur = durations.length ? Math.round(durations.reduce((a,b) => a+b, 0) / durations.length) : 0;
+  document.getElementById('statDuration').textContent = `${avgDur} min`;
+}
+
+// =================== TOAST ===================
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  const colors = {
+    success: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300',
+    error: 'bg-red-500/10 border-red-500/30 text-red-300',
+    info: 'bg-sky-500/10 border-sky-500/30 text-sky-300'
+  };
+  const icons = {
+    success: '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />',
+    error: '<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />',
+    info: '<path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />'
+  };
+  toast.className = `toast-in flex items-center gap-3 px-4 py-3 rounded-lg border backdrop-blur-lg ${colors[type]} min-w-[280px]`;
+  toast.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">${icons[type]}</svg>
+    <span class="text-sm font-medium flex-1">${message}</span>
+  `;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.transition = 'all 0.3s ease';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(100%)';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// =================== CONFIRM ===================
+function showConfirm(text, callback) {
+  document.getElementById('confirmText').textContent = text;
+  document.getElementById('confirmModal').classList.remove('hidden');
+  confirmCallback = callback;
+  document.getElementById('confirmOk').onclick = () => {
+    hideConfirm();
+    if (confirmCallback) confirmCallback();
+  };
+}
+function hideConfirm() {
+  document.getElementById('confirmModal').classList.add('hidden');
+  confirmCallback = null;
+}
+
+// Expose to inline onclick
+window.openModal = openModal;
+window.openDetail = openDetail;
+window.deleteMovie = deleteMovie;
+window.showConfirm = showConfirm;
+
+// =================== START ===================
+init();
+</script>
+</body>
+</html>
