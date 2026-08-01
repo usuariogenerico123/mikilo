@@ -30,8 +30,10 @@ export function Sidebar({setMainView}){
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Principal</span>
                 </div>
                 {/* <a href="#" className="nav-item active flex items-center gap-3 px-6 py-3 text-sm text-gray-300" onclick="switchView('dashboard')"> */}
-                <a href="#" className="nav-item active flex items-center gap-3 px-6 py-3 text-sm text-gray-300" onClick={
-                    ()=>{
+                <a 
+                    href="#" 
+                    className={styles["nav-item"]+" active flex items-center gap-3 px-6 py-3 text-sm text-gray-300"} 
+                    onClick={()=>{
                         setMainView("dashboardView");
                     }
                     }>
@@ -39,7 +41,7 @@ export function Sidebar({setMainView}){
                     <i className="fas fa-chart-pie w-5 text-center text-indigo-400"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="#" className="nav-item flex items-center gap-3 px-6 py-3 text-sm text-gray-300" 
+                <a href="#" className={styles["nav-item"]+" active flex items-center gap-3 px-6 py-3 text-sm text-gray-300"} 
                     onClick={()=>{
                         setMainView("moviesView")
                     }}
@@ -53,11 +55,11 @@ export function Sidebar({setMainView}){
                     onClick={()=>{
                        modalHandler() 
                     }}
-                    className="nav-item flex items-center gap-3 px-6 py-3 text-sm text-gray-300" >
+                    className={styles["nav-item"]+" active flex items-center gap-3 px-6 py-3 text-sm text-gray-300"} >
                     <i className="fas fa-plus-circle w-5 text-center text-green-400"></i>
                     <span>Agregar Película</span>
                 </a>
-                {openModal && <MovieModal modalHandler={modalHandler}/>}
+                {openModal && <MovieModal modalHandler={modalHandler} movieInfo={{}}/>}
 
 
                 <div className="px-4 mt-6 mb-2">

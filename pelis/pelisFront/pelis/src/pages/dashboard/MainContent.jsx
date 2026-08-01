@@ -1,7 +1,13 @@
+import { useState } from "react";
 import styles from "./style/Dashboard.module.css";
+import { MovieModal } from "./components/MovieModal";
 
 export function MainContent({view}){
 
+    const [openModal, setOpenModal]=useState(false);
+    const modalHandler = ()=>{
+        setOpenModal(!openModal);
+    }
 
     return (
         // <!-- Main Content -->
@@ -16,22 +22,26 @@ export function MainContent({view}){
                     <div className="flex items-center gap-4">
                         <div className="relative">
                             <input type="text" id="searchInput" placeholder="Buscar películas..." 
-                                className="input-field w-80 pl-10 pr-4 py-2.5 rounded-xl text-sm text-white placeholder-gray-500"
+                                className={styles["input-field"]+" w-80 pl-10 pr-4 py-2.5 rounded-xl text-sm text-white placeholder-gray-500"}
                                 // onInput="handleSearch(this.value)"
                                 />
                             <i className="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500"></i>
                         </div>
                         {/* <button onclick="openModal()" className="btn-primary px-5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2">
                          */}
-                        <button  className="btn-primary px-5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2">
-                        
+                        <button  
+                            onClick={()=>{
+                                modalHandler()
+                            }}
+                            className={styles["btn-primary"]+" px-5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2"}>
+                            
                             <i className="fas fa-plus"></i>
                             <span>Nueva Película</span>
                         </button>
                     </div>
                 </div>
             </header>
-        
+            { openModal && <MovieModal modalHandler={modalHandler} movieInfo={{}}/>  }
             { view }
             {/* <!-- Dashboard View --> */}
             

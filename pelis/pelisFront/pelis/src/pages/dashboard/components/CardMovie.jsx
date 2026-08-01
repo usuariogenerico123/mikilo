@@ -1,14 +1,15 @@
 import { useState } from "react"
 import { MovieModal } from "./MovieModal";
+import styles from "../style/Dashboard.module.css";
 
-export function CardMovie({movie}) {
-    const [openModal, setOpenModal] = useState(false);
-    const modalHandle = ()=>{
-        setOpenModal(!openModal);
-    }
+export function CardMovie({movie, modalHandler, videoInfoHandler}) {
+    // const [openModal, setOpenModal] = useState(false);
+    // const modalHandle = ()=>{
+    //     setOpenModal(!openModal);
+    // }
 
     return (
-        <div className="card-movie rounded-2xl overflow-hidden group">
+        <div className=" rounded-2xl overflow-hidden group">
             <div className="relative h-52 bg-gradient-to-br from-indigo-900/50 to-purple-900/50 flex items-center justify-center overflow-hidden">
                 {movie.image ?
                     <img 
@@ -21,11 +22,12 @@ export function CardMovie({movie}) {
                 }
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4 gap-2">
                     
-                    {openModal && <MovieModal modalHandler={modalHandle} />}
+                    {/* {openModal && <MovieModal modalHandler={modalHandle} />} */}
 
                     <button 
                         onClick={()=>{
-                            modalHandle()
+                            modalHandler();
+                            videoInfoHandler(movie);
                         }}
                         // onclick="editMovie(${realIdx})" 
                         className="w-9 h-9 rounded-lg bg-indigo-500/80 flex items-center justify-center hover:bg-indigo-500 transition" title="Editar">

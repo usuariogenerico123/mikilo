@@ -1,6 +1,8 @@
 import styles from "../style/Dashboard.module.css";
 
-export function MovieModal({modalHandler}) {
+export function MovieModal({modalHandler, movieInfo}) {
+
+
 
     return (
         // <!-- Modal -->
@@ -13,7 +15,7 @@ export function MovieModal({modalHandler}) {
             </div>
             <div className={styles["modal-content"]+" absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] rounded-2xl overflow-y-auto scrollbar-thin"}>
                 <div className="sticky top-0 bg-[#1a1a2e] border-b border-white/5 px-8 py-5 flex items-center justify-between z-10">
-                    <h3 className="text-xl font-bold text-white" id="modalTitle">Agregar Película</h3>
+                    <h3 className="text-xl font-bold text-white" id="modalTitle">{movieInfo.title ? "Editar pelicula" : "Agregar pelicula"}</h3>
                     <button 
                         // onclick="closeModal()"
                         onClick={()=>{
@@ -32,53 +34,106 @@ export function MovieModal({modalHandler}) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-300 mb-2">Título *</label>
-                            <input type="text" id="f_title" required className="input-field w-full px-4 py-3 rounded-xl text-white text-sm" placeholder="Nombre de la película" />
+                            <input 
+                                defaultValue={ movieInfo.title ? movieInfo.title : null }
+                                type="text" 
+                                id="f_title" 
+                                required className={styles["input-field"]+" w-full px-4 py-3 rounded-xl text-white text-sm"} 
+                                placeholder="Nombre de la película" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">Año *</label>
-                            <input type="number" id="f_year" required min="1900" max="2099" className="input-field w-full px-4 py-3 rounded-xl text-white text-sm" placeholder="2024" />
+                            <input 
+                                defaultValue={ movieInfo.year ? movieInfo.year : null }
+                                type="number" 
+                                id="f_year" 
+                                required min="1900" 
+                                max="2099"  
+                                className={styles["input-field"]+" w-full px-4 py-3 rounded-xl text-white text-sm"} 
+                                placeholder="2024" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">Duración *</label>
-                            <input type="text" id="f_duration" required className="input-field w-full px-4 py-3 rounded-xl text-white text-sm" placeholder="2h 30min" />
+                            <input 
+                                defaultValue={ movieInfo.duration ? movieInfo.duration : null }
+                                type="text" 
+                                id="f_duration" 
+                                required className={styles["input-field"]+" w-full px-4 py-3 rounded-xl text-white text-sm"} 
+                                placeholder="2h 30min" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">Género *</label>
-                            <input type="text" id="f_genre" required className="input-field w-full px-4 py-3 rounded-xl text-white text-sm" placeholder="Acción, Drama" />
+                            <input 
+                                defaultValue={ movieInfo.genre ? movieInfo.genre : null }
+                                type="text" 
+                                id="f_genre" 
+                                required className={styles["input-field"]+" w-full px-4 py-3 rounded-xl text-white text-sm"} 
+                                placeholder="Acción, Drama" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">Rating *</label>
-                            <input type="number" id="f_rating" required min="0" max="10" step="0.1" className="input-field w-full px-4 py-3 rounded-xl text-white text-sm" placeholder="8.5" />
+                            <input 
+                                defaultValue={ movieInfo.rating ? movieInfo.rating : null }
+                                type="number" 
+                                id="f_rating" 
+                                required min="0"
+                                max="10" step="0.1" 
+                                className={styles["input-field"]+" w-full px-4 py-3 rounded-xl text-white text-sm"} 
+                                placeholder="8.5" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">Director *</label>
-                            <input type="text" id="f_director" required className="input-field w-full px-4 py-3 rounded-xl text-white text-sm" placeholder="Nombre del director" />
+                            <input 
+                                defaultValue={ movieInfo.director ? movieInfo.director : null }
+                                type="text" 
+                                id="f_director" 
+                                required className={styles["input-field"]+" w-full px-4 py-3 rounded-xl text-white text-sm"} 
+                                placeholder="Nombre del director" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">Cast</label>
-                            <input type="text" id="f_cast" className="input-field w-full px-4 py-3 rounded-xl text-white text-sm" placeholder="Actor 1, Actor 2, Actor 3" />
+                            <input 
+                                defaultValue={ movieInfo.cast ? movieInfo.cast : null }
+                                type="text" 
+                                id="f_cast" 
+                                className={styles["input-field"]+" w-full px-4 py-3 rounded-xl text-white text-sm"} 
+                                placeholder="Actor 1, Actor 2, Actor 3" />
                         </div>
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-300 mb-2">URL de la Película</label>
-                            <input type="url" id="f_movie_url" className="input-field w-full px-4 py-3 rounded-xl text-white text-sm" placeholder="https://..." />
+                            <input 
+                                defaultValue={ movieInfo.movie_url ? movieInfo.movie_url : null }
+                                type="url" id="f_movie_url" 
+                                className={styles["input-field"]+" w-full px-4 py-3 rounded-xl text-white text-sm"} 
+                                placeholder="https://..." />
                         </div>
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-300 mb-2">URL de la Imagen</label>
-                            <input type="url" id="f_image" className="input-field w-full px-4 py-3 rounded-xl text-white text-sm" placeholder="https://..." />
+                            <input 
+                                defaultValue={ movieInfo.image ? movieInfo.image : null }
+                                type="url" 
+                                id="f_image" 
+                                className={styles["input-field"]+" w-full px-4 py-3 rounded-xl text-white text-sm"} 
+                                placeholder="https://......" />
                         </div>
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-300 mb-2">Descripción</label>
-                            <textarea id="f_description" rows="3" className="input-field w-full px-4 py-3 rounded-xl text-white text-sm resize-none" placeholder="Sinopsis de la película..."></textarea>
+                            <textarea 
+                                defaultValue={ movieInfo.description ? movieInfo.description : null }
+                                id="f_description" 
+                                rows="3" 
+                                className={styles["input-field"]+" w-full px-4 py-3 rounded-xl text-white text-sm"} 
+                                placeholder="Sinopsis de la película..."></textarea>
                         </div>
                     </div>
 
                     <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/5">
                         <button type="button" 
                             // onclick="closeModal()" 
-                            className="btn-secondary px-6 py-3 rounded-xl text-sm font-medium text-gray-300">
+                            className={styles["btn-secondary"]+" px-6 py-3 rounded-xl text-sm font-medium text-gray-300"}>
                             Cancelar
                         </button>
-                        <button type="submit" className="btn-primary px-6 py-3 rounded-xl text-sm font-medium text-white">
+                        <button type="submit" className={styles["btn-primary"]+" px-6 py-3 rounded-xl text-sm font-medium text-white"}>
                             <i className="fas fa-save mr-2"></i>
                             <span id="submitBtnText">Guardar Película</span>
                         </button>
