@@ -1,5 +1,11 @@
-export function CardMovie({movie}) {
+import { useState } from "react"
+import { MovieModal } from "./MovieModal";
 
+export function CardMovie({movie}) {
+    const [openModal, setOpenModal] = useState(false);
+    const modalHandle = ()=>{
+        setOpenModal(!openModal);
+    }
 
     return (
         <div className="card-movie rounded-2xl overflow-hidden group">
@@ -14,7 +20,13 @@ export function CardMovie({movie}) {
                     <i className="fas fa-film text-5xl text-indigo-400/30"></i>
                 }
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4 gap-2">
+                    
+                    {openModal && <MovieModal modalHandler={modalHandle} />}
+
                     <button 
+                        onClick={()=>{
+                            modalHandle()
+                        }}
                         // onclick="editMovie(${realIdx})" 
                         className="w-9 h-9 rounded-lg bg-indigo-500/80 flex items-center justify-center hover:bg-indigo-500 transition" title="Editar">
                         <i className="fas fa-edit text-white text-sm"></i>
