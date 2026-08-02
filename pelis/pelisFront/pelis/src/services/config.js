@@ -1,8 +1,15 @@
 
 
+export const API_URL = "https://c958d589c21bc959-51-8-152-65.serveousercontent.com"
+export const REGISTER_ENDPOINT = API_URL + "/register"
+export const LOGIN_ENDPOINT = API_URL + "/login"
+export const ADDMOVIE_ENDPOINT = API_URL + "/api/movies"
 
-export const API_URL = "https://96fe8c2944c3bdcb-135-237-130-227.serveousercontent.com"
-export const REGISTER_PATH = API_URL + "/register"
-export const LOGIN_PATH = API_URL + "/login"
 
+// export const API = axios.create({
+//     baseURL: API_URL,
+//     headers :{
+//         Authorization: `Bearer ${}`
+//     }
+// })
 

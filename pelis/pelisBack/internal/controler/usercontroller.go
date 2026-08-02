@@ -71,7 +71,7 @@ func (u *UserController) Login(c *gin.Context){
 	c.SetCookie(
 		"token", token, 3600, "/", "/", true, true,
 	)
-	c.IndentedJSON(http.StatusAccepted, &user.UserResponse{Name: userr.Name, Email: userr.Email})
+	c.IndentedJSON(http.StatusAccepted, gin.H{"btoken":token,"user":&user.UserResponse{Name: userr.Name, Email: userr.Email}})
 
 }
 
