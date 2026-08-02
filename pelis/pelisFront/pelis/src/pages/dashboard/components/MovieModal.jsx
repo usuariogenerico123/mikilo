@@ -1,10 +1,16 @@
 import { useState } from "react";
 import styles from "../style/Dashboard.module.css";
 import { PostAddMovie } from "../../../services/api";
+import { preview } from "vite";
 
 export function MovieModal({modalHandler, movieInfo}) {
     let movieJson = {}
     const [movie, setMovie] = useState({});
+    const handleChange = (key, value)=>{
+        setMovie(prev => ({ ...prev, [key]:value}));
+    }   
+
+
     const saveMovie =  (e)=>{
         e.preventDefault()
         const post = async ()=>{
@@ -28,7 +34,7 @@ export function MovieModal({modalHandler, movieInfo}) {
         console.log("xd");
     }
 
-
+    console.log(movieJson)
 
     return (
         // <!-- Modal -->
@@ -51,7 +57,11 @@ export function MovieModal({modalHandler, movieInfo}) {
                         <i className="fas fa-times text-gray-400">X</i>
                     </button>
                 </div>
-                <form id="movieForm" 
+                <form 
+                    onSubmit={(e)=>{
+                        saveMovie
+                    }}
+                    id="movieForm" 
                     className="p-8 space-y-5" 
                     // onsubmit="handleSubmit(event)"
                     >
@@ -62,7 +72,7 @@ export function MovieModal({modalHandler, movieInfo}) {
                             <label className="block text-sm font-medium text-gray-300 mb-2">Título *</label>
                             <input 
                                 onChange={(e)=>{
-                                    setMovie(movieJson.title=e.target.value)
+                                    handleChange("title", e.target.value)
                                 }}
                                 defaultValue={ movieInfo.title ? movieInfo.title : null }
                                 type="text" 
@@ -74,7 +84,7 @@ export function MovieModal({modalHandler, movieInfo}) {
                             <label className="block text-sm font-medium text-gray-300 mb-2">Año *</label>
                             <input 
                                 onChange={(e)=>{
-                                    setMovie(movieJson.year=e.target.value)
+                                    handleChange("year", e.target.value)
                                 }}
                                 defaultValue={ movieInfo.year ? movieInfo.year : null }
                                 type="number" 
@@ -88,7 +98,7 @@ export function MovieModal({modalHandler, movieInfo}) {
                             <label className="block text-sm font-medium text-gray-300 mb-2">Duración *</label>
                             <input 
                                 onChange={(e)=>{
-                                    setMovie(movieJson.duration=e.target.value)
+                                    handleChange("duration", e.target.value)
                                 }}
                                 defaultValue={ movieInfo.duration ? movieInfo.duration : null }
                                 type="text" 
@@ -100,7 +110,7 @@ export function MovieModal({modalHandler, movieInfo}) {
                             <label className="block text-sm font-medium text-gray-300 mb-2">Género *</label>
                             <input 
                                 onChange={(e)=>{
-                                    setMovie(movieJson.genre=e.target.value)
+                                    handleChange("genre", e.target.value)
                                 }}
                                 defaultValue={ movieInfo.genre ? movieInfo.genre : null }
                                 type="text" 
@@ -193,7 +203,7 @@ export function MovieModal({modalHandler, movieInfo}) {
                             type="submit"
                             onClick={(e)=>{
                                 setMovie(movieJson)
-                                saveMovie(e)
+                               
                             }} 
                             className={styles["btn-primary"]+" px-6 py-3 rounded-xl text-sm font-medium text-white"}>
                             <i className="fas fa-save mr-2"></i>
