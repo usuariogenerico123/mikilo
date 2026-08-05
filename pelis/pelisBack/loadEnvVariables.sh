@@ -1,9 +1,6 @@
 #!/bin/bash
 
 
-JWT_SECRET=""
-URL_DB=""
-
 export JWT_SECRET=$JWT_SECRET
 export URL_DB=$URL_DB
 

@@ -1,11 +1,25 @@
 
 
-export const API_URL = "https://1a4981ab2df9cec0-51-8-152-65.serveousercontent.com"
+export const API_URL = "https://cda7f1aa746bfada-51-8-152-65.serveousercontent.com"
 export const REGISTER_ENDPOINT = API_URL + "/register"
 export const LOGIN_ENDPOINT = API_URL + "/login"
-export const ADDMOVIE_ENDPOINT = API_URL + "/api/movies"
+export const MOVIES_ENDPOINT = API_URL + "/api/movies"
 
 
+// export const BODY = {
+//         id:movie.id,
+//         title: movie.title,
+//         year: movie.year,
+//         duration: movie.duration,
+//         rating: movie.rating,
+//         genre: movie.genre,
+//         description: movie.description,
+//         director: movie.director,
+//         cast: movie.cast,
+//         image: movie.image,
+//         category: movie.category,
+//         movie_url: movie.movie_url
+//     }
 // export const API = axios.create({
 //     baseURL: API_URL,
 //     headers :{

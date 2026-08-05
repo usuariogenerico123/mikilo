@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styles from "../style/Dashboard.module.css";
 import { PostAddMovie } from "../../../services/api";
-import { preview } from "vite";
+
 
 export function MovieModal({modalHandler, movieInfo}) {
     let movieJson = {}
@@ -34,7 +34,7 @@ export function MovieModal({modalHandler, movieInfo}) {
         console.log("xd");
     }
 
-    console.log(movieJson)
+    console.log(movie);
 
     return (
         // <!-- Modal -->
@@ -59,7 +59,7 @@ export function MovieModal({modalHandler, movieInfo}) {
                 </div>
                 <form 
                     onSubmit={(e)=>{
-                        saveMovie
+                        saveMovie(e)
                     }}
                     id="movieForm" 
                     className="p-8 space-y-5" 
@@ -122,7 +122,7 @@ export function MovieModal({modalHandler, movieInfo}) {
                             <label className="block text-sm font-medium text-gray-300 mb-2">Rating *</label>
                             <input 
                                 onChange={(e)=>{
-                                    setMovie(movieJson.rating=e.target.value)
+                                    handleChange("rating", e.target.value)
                                 }}
                                 defaultValue={ movieInfo.rating ? movieInfo.rating : null }
                                 type="number" 
@@ -136,7 +136,7 @@ export function MovieModal({modalHandler, movieInfo}) {
                             <label className="block text-sm font-medium text-gray-300 mb-2">Director *</label>
                             <input 
                                 onChange={(e)=>{
-                                    setMovie(movieJson.director=e.target.value)
+                                    handleChange("director", e.target.value)
                                 }}
                                 defaultValue={ movieInfo.director ? movieInfo.director : null }
                                 type="text" 
@@ -148,7 +148,7 @@ export function MovieModal({modalHandler, movieInfo}) {
                             <label className="block text-sm font-medium text-gray-300 mb-2">Cast</label>
                             <input 
                                 onChange={(e)=>{
-                                    setMovie(movieJson.cast=e.target.value)
+                                    handleChange("cast", e.target.value)
                                 }}
                                 defaultValue={ movieInfo.cast ? movieInfo.cast : null }
                                 type="text" 
@@ -160,7 +160,7 @@ export function MovieModal({modalHandler, movieInfo}) {
                             <label className="block text-sm font-medium text-gray-300 mb-2">URL de la Película</label>
                             <input 
                                 onChange={(e)=>{
-                                    setMovie(movieJson.movie_url=e.target.value)
+                                    handleChange("movie_url", e.target.value)
                                 }}
                                 defaultValue={ movieInfo.movie_url ? movieInfo.movie_url : null }
                                 type="url" id="f_movie_url" 
@@ -171,7 +171,7 @@ export function MovieModal({modalHandler, movieInfo}) {
                             <label className="block text-sm font-medium text-gray-300 mb-2">URL de la Imagen</label>
                             <input 
                                 onChange={(e)=>{
-                                    setMovie(movieJson.image=e.target.value)
+                                    handleChange("image", e.target.value)
                                 }}
                                 defaultValue={ movieInfo.image ? movieInfo.image : null }
                                 type="url" 
@@ -183,7 +183,7 @@ export function MovieModal({modalHandler, movieInfo}) {
                             <label className="block text-sm font-medium text-gray-300 mb-2">Descripción</label>
                             <textarea 
                                 onChange={(e)=>{
-                                    setMovie(movieJson.description=e.target.value)
+                                    handleChange("description", e.target.value)
                                 }}
                                 defaultValue={ movieInfo.description ? movieInfo.description : null }
                                 id="f_description" 
@@ -201,10 +201,6 @@ export function MovieModal({modalHandler, movieInfo}) {
                         </button>
                         <button 
                             type="submit"
-                            onClick={(e)=>{
-                                setMovie(movieJson)
-                               
-                            }} 
                             className={styles["btn-primary"]+" px-6 py-3 rounded-xl text-sm font-medium text-white"}>
                             <i className="fas fa-save mr-2"></i>
                             <span id="submitBtnText">Guardar Película</span>

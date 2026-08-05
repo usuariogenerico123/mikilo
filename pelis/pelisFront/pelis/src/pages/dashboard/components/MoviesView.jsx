@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import styles from "../style/Dashboard.module.css";
 import { GridView } from "./GridView";
+import { GetItems } from "../../../services/api";
 
 
 
@@ -67,6 +69,30 @@ const pelis = [
 ]
 
 export function MoviesView(){
+
+    const [movies, setMovies] = useState(null);
+
+    useEffect(()=>{
+        async function getItems(){
+            try{
+                const resp = await GetItems();
+                if(resp.status){
+                    console.log(resp.status);
+                    setMovies(resp.data);
+                    return
+                }
+
+            }catch(error){
+                alert("Ocurrio un error");
+                console.log(error)
+                return
+            }
+        }
+        getItems();
+    }, [])
+
+
+
     return(
         
             <div id="moviesView" className="p-8 ">
@@ -112,7 +138,7 @@ export function MoviesView(){
                 </div>
 
                 {/* <!-- Grid View --> */}
-                <GridView movies={pelis} />
+                { movies ? <GridView movies={movies} />: "Cargando..."}
 
                 {/* <!-- Table View --> */}
                 <div id="tableView" className="hidden">

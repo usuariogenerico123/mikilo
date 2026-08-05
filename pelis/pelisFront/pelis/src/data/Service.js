@@ -1,5 +1,5 @@
 import axios from "axios"
-import { movies } from "./MoviesData"
+import { movies } from "./MoviesData";
 
 
 export function GetByGenre(genre){
@@ -19,7 +19,7 @@ export function GetByGenre(genre){
 
 
 export async function GetByGennre(genre){
-    const url = `https://c958d589c21bc959-51-8-152-65.serveousercontent.com/api/movies/genre/${genre}`
+    const url = `https://cda7f1aa746bfada-51-8-152-65.serveousercontent.com/api/movies/genre/${genre}`
     let resp = await axios.get(url)
     return resp
 }
