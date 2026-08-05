@@ -2,12 +2,13 @@ import { useState } from "react"
 import { MovieModal } from "./MovieModal";
 import styles from "../style/Dashboard.module.css";
 
-export function CardMovie({movie, modalHandler, videoInfoHandler}) {
+export function CardMovie({movie, modalHandler, videoInfoHandler, deleteConfirmationModal}) {
     // const [openModal, setOpenModal] = useState(false);
     // const modalHandle = ()=>{
     //     setOpenModal(!openModal);
     // }
 
+    
     return (
         <div className=" rounded-2xl overflow-hidden group">
             <div className="relative h-52 bg-gradient-to-br from-indigo-900/50 to-purple-900/50 flex items-center justify-center overflow-hidden">
@@ -34,7 +35,13 @@ export function CardMovie({movie, modalHandler, videoInfoHandler}) {
                         <i className="fas fa-edit text-white text-sm"></i>
                     </button>
                     <button 
-                        // onclick="deleteMovie({realIdx})" 
+                        // onclick="deleteMovie({realIdx})"
+                        onClick={
+                            ()=>{
+                                console.log("delete confirmation");
+                                deleteConfirmationModal();
+                            }
+                        } 
                         className="w-9 h-9 rounded-lg bg-red-500/80 flex items-center justify-center hover:bg-red-500 transition" title="Eliminar">
                         <i className="fas fa-trash text-white text-sm"></i>
                     </button>

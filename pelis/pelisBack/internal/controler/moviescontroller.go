@@ -59,6 +59,7 @@ func (m *MovieController) GetById(c *gin.Context){
 
 //--------------------GET ALL ITEMS
 func (m *MovieController) GetAllMovies(c *gin.Context){
+	var MoviesResponse []*movie.MovieResponse
 	userId, ok := c.Get("UserId")
 	if(!ok){
 		c.IndentedJSON(http.StatusUnauthorized, &security.MessageError{Ok: false, Message: "Not authorized"})
@@ -70,7 +71,12 @@ func (m *MovieController) GetAllMovies(c *gin.Context){
 		c.IndentedJSON(http.StatusNotFound, &security.MessageError{Ok: false, Message: err.Error()})
 		return
 	}
-	var MoviesResponse []*movie.MovieResponse
+	if(len(movies) == 0){
+		c.IndentedJSON(http.StatusOK, &[]security.MessageEmpty{})
+		return
+	}
+
+	
 	for _, v := range movies{
 		MoviesResponse = append(MoviesResponse, &movie.MovieResponse{
 			Id: v.GetId(),

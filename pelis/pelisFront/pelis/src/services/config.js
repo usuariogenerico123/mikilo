@@ -1,6 +1,6 @@
 
 
-export const API_URL = "https://cda7f1aa746bfada-51-8-152-65.serveousercontent.com"
+export const API_URL = "https://d1e7ba7bcf00bfe5-135-237-130-226.serveousercontent.com"
 export const REGISTER_ENDPOINT = API_URL + "/register"
 export const LOGIN_ENDPOINT = API_URL + "/login"
 export const MOVIES_ENDPOINT = API_URL + "/api/movies"

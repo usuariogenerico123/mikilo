@@ -8,3 +8,7 @@ type MessageError struct{
 }
 
 
+type MessageEmpty struct{
+	
+}
+

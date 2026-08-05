@@ -70,8 +70,8 @@ const pelis = [
 
 export function MoviesView(){
 
-    const [movies, setMovies] = useState(null);
-
+    const [movies, setMovies] = useState([]);
+    const [ok, setOK] = useState(false);
     useEffect(()=>{
         async function getItems(){
             try{
@@ -79,12 +79,16 @@ export function MoviesView(){
                 if(resp.status){
                     console.log(resp.status);
                     setMovies(resp.data);
+                    setOK(!ok);
                     return
                 }
 
             }catch(error){
                 alert("Ocurrio un error");
                 console.log(error)
+
+                setMovies(null);
+                setOK(!ok);
                 return
             }
         }
@@ -92,6 +96,7 @@ export function MoviesView(){
     }, [])
 
 
+   //console.log(movies);
 
     return(
         
@@ -138,7 +143,11 @@ export function MoviesView(){
                 </div>
 
                 {/* <!-- Grid View --> */}
-                { movies ? <GridView movies={movies} />: "Cargando..."}
+                { 
+                    !ok ? <p>cargando..</p>:
+                    movies.length != 0 ? <GridView movies={movies} />: 
+                    <p>No hay datos</p>
+                }   
 
                 {/* <!-- Table View --> */}
                 <div id="tableView" className="hidden">

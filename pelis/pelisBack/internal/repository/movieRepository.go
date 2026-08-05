@@ -24,7 +24,7 @@ func(m *MovieRepository) GetAllMovies(userId uint)([]model.Movie, error){
 		return nil, errors.New("Items not found")
 	}
 	if(len(item) == 0){
-		return nil, errors.New("Empty")
+		return []model.Movie{}, nil
 	}
 	return item, nil
 }
