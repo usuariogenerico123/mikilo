@@ -38,7 +38,7 @@ export function GridView({movies}){
             }
         </div>
         {openModal && <MovieModal modalHandler={modalHandler} movieInfo={movieData}/>}
-        {deleteConfirmation && <DeleteConfirmationModal deleteModalHandler={deleteConfirmationModal} movieData={movieData}/>}
+        {deleteConfirmation && <DeleteConfirmationModal deleteModalHandler={deleteConfirmationModal} movieData={movieData} />}
         </>
     )
 }

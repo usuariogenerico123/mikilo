@@ -1,8 +1,30 @@
+import { useState } from "react";
 import styles from "../style/Dashboard.module.css";
+import { DeleteItem } from "../../../services/moviesService";
 
 export function DeleteConfirmationModal({ deleteModalHandler, movieData}){
+    const [deleteStatus, setDeleteStatus] = useState(false);
+    const deleteItem = (id)=>{
+        const req = async ()=>{
+            try{
+                const resp = await DeleteItem(id);
+                if(resp.status){
+                    alert("Elemento eliminado con exito");
+                    setDeleteStatus(!deleteStatus);
+                    deleteModalHandler()
+                    return
+                }
+            }catch(error){
+                console.log(error);
+                alert("No se pudo eliminar el elemento");
+                return
+            }
 
+        }
+        req();
+    }
 
+    console.log(movieData)
     return (
         // <!-- Delete Confirmation Modal -->
         <div id="deleteModal" className="fixed inset-0 z-50 ">
@@ -34,6 +56,8 @@ export function DeleteConfirmationModal({ deleteModalHandler, movieData}){
                         // onClick="confirmDelete()" 
                         onClick={()=>{
                             console.log("click");
+                            //console.log(movieData);
+                            deleteItem(movieData.id);
                         }}
 
                         className={styles["btn-danger"]+" px-6 py-3 rounded-xl text-sm font-medium text-white"}>

@@ -39,6 +39,7 @@ export function CardMovie({movie, modalHandler, videoInfoHandler, deleteConfirma
                         onClick={
                             ()=>{
                                 console.log("delete confirmation");
+                                videoInfoHandler(movie);
                                 deleteConfirmationModal();
                             }
                         } 

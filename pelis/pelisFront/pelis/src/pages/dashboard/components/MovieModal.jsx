@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styles from "../style/Dashboard.module.css";
-import { PostAddMovie } from "../../../services/api";
+import { PostAddMovie } from "../../../services/moviesService";
 
 
 export function MovieModal({modalHandler, movieInfo}) {

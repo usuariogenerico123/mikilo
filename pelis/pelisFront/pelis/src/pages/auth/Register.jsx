@@ -1,5 +1,5 @@
 import styles  from "./Auth.module.css";
-import { RegisterService } from "../../services/auth";
+import { RegisterService } from "../../services/authService";
 import { useEffect, useState } from "react";
 
 export function Register(){

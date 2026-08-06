@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "../style/Dashboard.module.css";
 import { GridView } from "./GridView";
-import { GetItems } from "../../../services/api";
+import { GetItems } from "../../../services/moviesService";
 
 
 
