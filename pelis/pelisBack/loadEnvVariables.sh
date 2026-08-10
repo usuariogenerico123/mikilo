@@ -2,7 +2,6 @@
 
 
 
-
 jwt=$(echo $JWT_SECRET)
 db=$(echo $URL_DB)
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "../style/Dashboard.module.css";
 import { GridView } from "./GridView";
-import { GetItems } from "../../../services/moviesService";
+import { getItems } from "../../../services/moviesService";
 
 
 
@@ -73,9 +73,9 @@ export function MoviesView(){
     const [movies, setMovies] = useState([]);
     const [ok, setOK] = useState(false);
     useEffect(()=>{
-        async function getItems(){
+        async function getMovies(){
             try{
-                const resp = await GetItems();
+                const resp = await getItems();
                 if(resp.status){
                     console.log(resp.status);
                     setMovies(resp.data);
@@ -92,7 +92,7 @@ export function MoviesView(){
                 return
             }
         }
-        getItems();
+        getMovies();
     }, [])
 
 

@@ -1,21 +1,22 @@
 import { useState } from "react";
 import styles from "../style/Dashboard.module.css";
-import { PostAddMovie } from "../../../services/moviesService";
-
+import { postAddMovie } from "../../../services/moviesService";
+import { updateItem } from "../../../services/moviesService";
 
 export function MovieModal({modalHandler, movieInfo}) {
-    let movieJson = {}
+    const isPutHTTPMethod = Boolean(movieInfo.id);
+
     const [movie, setMovie] = useState({...movieInfo});
     const handleChange = (key, value)=>{
         setMovie(prev => ({ ...prev, [key]:value}));
     }   
 
 
-    const saveMovie =  (e)=>{
-        e.preventDefault()
+    const saveMovie =  ()=>{
+        //e.preventDefault()
         const post = async ()=>{
             try{
-                const resp = await PostAddMovie(movie);
+                const resp = await postAddMovie(movie);
                 if(resp.status){
                     alert("Pelicula guardada")
                     console.log(resp.data)
@@ -31,11 +32,42 @@ export function MovieModal({modalHandler, movieInfo}) {
 
         }
         post();
-        console.log("xd");
+        
     }
 
-    console.log(movie);
 
+    const updateMovie = ()=>{
+        //s.preventDefault()
+        async function put(){
+            try{
+                const resp = await updateItem(movie);
+                if(resp.status){
+                    alert("Pelicula editada correctamente");
+                    console.log(resp.data);
+                    return
+                }
+                console.log(resp.data)
+            }catch(error){
+                console.log(error);
+                return
+            }
+        }
+        put();
+    }
+
+    const methodHTTPHandler = (e)=>{
+        e.preventDefault();
+        
+        if(isPutHTTPMethod){
+            updateMovie(movie);
+            return
+        }
+        saveMovie(movie);
+        return
+    }
+
+    // console.log(movie);
+    console.log("isPutmethod: ", isPutHTTPMethod);
     return (
         // <!-- Modal -->
         <div id="movieModal" className="fixed inset-0 z-50 ">
@@ -60,7 +92,8 @@ export function MovieModal({modalHandler, movieInfo}) {
                 <form 
                     
                     onSubmit={(e)=>{
-                        saveMovie(e)
+                        methodHTTPHandler(e);
+                    
                     }}
                     id="movieForm" 
                     className="p-8 space-y-5" 

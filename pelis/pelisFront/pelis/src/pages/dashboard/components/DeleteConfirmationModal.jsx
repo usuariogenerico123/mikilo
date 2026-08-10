@@ -1,13 +1,13 @@
 import { useState } from "react";
 import styles from "../style/Dashboard.module.css";
-import { DeleteItem } from "../../../services/moviesService";
+import { deleteItem } from "../../../services/moviesService";
 
 export function DeleteConfirmationModal({ deleteModalHandler, movieData}){
     const [deleteStatus, setDeleteStatus] = useState(false);
     const deleteItem = (id)=>{
         const req = async ()=>{
             try{
-                const resp = await DeleteItem(id);
+                const resp = await deleteItem(id);
                 if(resp.status){
                     alert("Elemento eliminado con exito");
                     setDeleteStatus(!deleteStatus);

@@ -1,6 +1,6 @@
 
 
-export const API_URL = "https://f7699f6b03c47f.lhr.life"
+export const API_URL = "https://356f92a4fa9273.lhr.life"
 export const REGISTER_ENDPOINT = API_URL + "/register"
 export const LOGIN_ENDPOINT = API_URL + "/login"
 export const MOVIES_ENDPOINT = API_URL + "/api/movies"

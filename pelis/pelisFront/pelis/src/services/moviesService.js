@@ -13,7 +13,7 @@ api.interceptors.request.use(config =>{
     return config;
 })
 
-export async function PostAddMovie(movie){
+export async function postAddMovie(movie){
     // const bearer = localStorage.getItem("bearer");
     // const config = {
     //     headers: {
@@ -36,7 +36,7 @@ export async function PostAddMovie(movie){
         movie_url: movie.movie_url
     }
 
-    const resp = await api.post(data);
+    const resp = await api.post("", data);
     if(resp.status == 201){
         console.log("--------pelicula creada-----")
         console.log(resp.status)
@@ -48,7 +48,7 @@ export async function PostAddMovie(movie){
 
 }
 
-export async function GetItems(){
+export async function getItems(){
     // const bearer = localStorage.getItem("bearer");
     // const config = {
     //     headers: {
@@ -65,7 +65,7 @@ export async function GetItems(){
 }
 
 
-export async function DeleteItem(id){
+export async function deleteItem(id){
     const resp = await api.delete(`/${id}`);
     if(resp.status == 204){
         return {status: true}
@@ -73,7 +73,7 @@ export async function DeleteItem(id){
     return false
 }
 
-export async function UpdateItem(movie){
+export async function updateItem(movie){
     const data = {
         id: movie.id,
         title: movie.title,
@@ -89,7 +89,7 @@ export async function UpdateItem(movie){
         movie_url: movie.movie_url
     }
 
-   const resp = await api.put(data);
+   const resp = await api.put("", data);
    if(resp.status == 200){
         return {status:true, data:resp.data};
    }
