@@ -2,8 +2,6 @@
 
 
 
-export JWT_SECRET=$JWT_SECRET
-export URL_DB=$URL_DB
 
 jwt=$(echo $JWT_SECRET)
 db=$(echo $URL_DB)

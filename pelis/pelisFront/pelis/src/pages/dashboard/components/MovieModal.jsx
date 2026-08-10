@@ -5,7 +5,7 @@ import { PostAddMovie } from "../../../services/moviesService";
 
 export function MovieModal({modalHandler, movieInfo}) {
     let movieJson = {}
-    const [movie, setMovie] = useState({});
+    const [movie, setMovie] = useState({...movieInfo});
     const handleChange = (key, value)=>{
         setMovie(prev => ({ ...prev, [key]:value}));
     }   
@@ -58,6 +58,7 @@ export function MovieModal({modalHandler, movieInfo}) {
                     </button>
                 </div>
                 <form 
+                    
                     onSubmit={(e)=>{
                         saveMovie(e)
                     }}

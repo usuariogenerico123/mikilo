@@ -36,7 +36,7 @@ export async function PostAddMovie(movie){
         movie_url: movie.movie_url
     }
 
-    const resp = await api.post(MOVIES_ENDPOINT, data);
+    const resp = await api.post(data);
     if(resp.status == 201){
         console.log("--------pelicula creada-----")
         console.log(resp.status)
@@ -56,7 +56,7 @@ export async function GetItems(){
     //         }
     //     }
 
-    const resp = await api.get(MOVIES_ENDPOINT);
+    const resp = await api.get();
     if(resp.status == 200){
         return {status:true, data:resp.data};
     }
@@ -88,6 +88,13 @@ export async function UpdateItem(movie){
         category: movie.category,
         movie_url: movie.movie_url
     }
+
+   const resp = await api.put(data);
+   if(resp.status == 200){
+        return {status:true, data:resp.data};
+   }
+   return {status:false, data:resp.data};
+
 }
 
 
